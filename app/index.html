@@ -1,25 +1,119 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GTA VI trophy checklist</title>
+<title>Leonida Ledger — GTA 6 Trophy Guide &amp; Tracker</title>
+<meta name="description" content="Offline guide and tracker for all 55 PlayStation 5 trophies of Grand Theft Auto VI: checklist, roadmap to the platinum, missables, and a cited guide for every trophy.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <h1>GTA VI trophy checklist</h1>
-  <p id="progress">0 of 55 earned</p>
+<header class="top">
+  <div class="brand">
+    <div class="mark" aria-hidden="true">LL</div>
+    <div>
+      <h1>Leonida Ledger</h1>
+      <p class="tagline">GTA 6 Trophy Guide &amp; Tracker — Grand Theft Auto VI · PlayStation 5</p>
+    </div>
+  </div>
+  <div class="progress" id="progressBox" aria-live="polite">
+    <div class="bigcount"><span id="earnedCount">0</span><span class="of"> / 55 earned</span></div>
+    <div class="bar" role="progressbar" aria-label="Trophies earned" aria-valuemin="0" aria-valuemax="55" aria-valuenow="0" id="progressBar"><span id="progressFill"></span></div>
+    <p class="counts" id="gradeCounts">Platinum 0/1 · Gold 0/2 · Silver 0/6 · Bronze 0/46</p>
+    <p class="counts" id="stageCounts">Roadmap: Stage 1 · 0/12 · Stage 2 · 0/8 · Stage 3 · 0/20 · Stage 4 · 0/7 · Stage 5 · 0/8</p>
+  </div>
 </header>
-<div class="controls">
-  <label>Grade <select id="grade"><option value="all">All</option><option value="platinum">Platinum</option><option value="gold">Gold</option><option value="silver">Silver</option><option value="bronze">Bronze</option></select></label>
-  <button id="export" type="button">Export progress</button>
-  <label class="import">Import progress <input id="import" type="file" accept="application/json"></label>
-</div>
-<table>
-  <thead><tr><th>Earned</th><th>Trophy</th><th>Grade</th><th>How to get it</th></tr></thead>
-  <tbody id="rows"></tbody>
-</table>
-<script type="module" src="app.js"></script>
+
+<nav class="tabs" aria-label="Views">
+  <button type="button" class="tab active" data-view="tracker" id="tabTracker">Tracker</button>
+  <button type="button" class="tab" data-view="roadmap" id="tabRoadmap">Roadmap to Platinum</button>
+  <button type="button" class="tab" data-view="missable" id="tabMissable">Missables <span class="pill" id="missablePill">30 flagged</span></button>
+</nav>
+
+<section class="toolbar" aria-label="Tracker controls">
+  <label class="search">Search
+    <input type="search" id="search" placeholder="Search trophy name or description…" autocomplete="off">
+  </label>
+  <label>Kind
+    <select id="filterKind">
+      <option value="all">All kinds</option>
+      <option value="story">Story</option>
+      <option value="side">Side strands</option>
+      <option value="activity">Activities</option>
+      <option value="collectible">Collectibles</option>
+      <option value="exploration">Exploration</option>
+      <option value="combat">Combat</option>
+      <option value="money">Money</option>
+      <option value="missable">Missable only</option>
+    </select>
+  </label>
+  <label>Grade
+    <select id="filterGrade">
+      <option value="all">All grades</option>
+      <option value="platinum">Platinum</option>
+      <option value="gold">Gold</option>
+      <option value="silver">Silver</option>
+      <option value="bronze">Bronze</option>
+    </select>
+  </label>
+  <label>Status
+    <select id="filterStatus">
+      <option value="all">Earned + not earned</option>
+      <option value="earned">Earned only</option>
+      <option value="not">Not earned only</option>
+    </select>
+  </label>
+  <label>Sort
+    <select id="sortBy">
+      <option value="official">Official order</option>
+      <option value="grade">Grade (best first)</option>
+      <option value="name">Name A–Z</option>
+    </select>
+  </label>
+  <label class="spoiler"><input type="checkbox" id="spoilerToggle" checked> Hide story spoilers</label>
+  <div class="actions">
+    <button type="button" id="exportBtn">Export progress</button>
+    <button type="button" id="importBtn">Import progress</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <button type="button" id="resetBtn">Reset</button>
+  </div>
+</section>
+<p class="hint">55 trophies · 1 Platinum · 2 Gold · 6 Silver · 46 Bronze · 28 hidden on PlayStation. Progress saves in this browser (localStorage) — export it to keep a backup. Spoilers ON hides the names of hidden story trophies until you earn them.</p>
+
+<main>
+  <section id="viewTracker" class="view">
+    <div class="layout">
+      <div>
+        <p class="listmeta" id="listMeta">Showing all 55 trophies</p>
+        <ul class="trophies" id="trophyList"></ul>
+        <p class="empty" id="emptyMsg" hidden>No trophies match these filters. Clear the search or change a filter.</p>
+      </div>
+      <aside class="detail" id="detailPane" aria-label="Trophy guide">
+        <p class="detail-empty" id="detailEmpty">Click a trophy to open its guide here — official description, your steps, target counter and sources.</p>
+        <div id="detailBody" hidden></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="viewRoadmap" class="view" hidden>
+    <h2>Roadmap to the Platinum</h2>
+    <p class="lede">Five stages, in order, built from the official trophy descriptions. Finish a stage before the next one where the guide says so — the story stages cannot be replayed, the rest can be cleaned up in free roam.</p>
+    <p class="nextup"><strong>Next up:</strong> <span id="nextUp">Finish the story missions in Stage 1.</span></p>
+    <div id="roadmapStages"></div>
+  </section>
+
+  <section id="viewMissable" class="view" hidden>
+    <h2>Missable Trophies — 30 flagged</h2>
+    <p class="lede">Every trophy that can be missed or is tied to a one-time moment, with the reason built from its official description. <strong>Do the story and side-strand trophies in order</strong> — no chapter replay is confirmed in the official description. Collectibles, activities and money trophies are <strong>not</strong> flagged: they can be finished in free roam after the story.</p>
+    <p class="warn">Honest note: the game is days old and the official descriptions do not name every mission step or location. Where a step is not in the official description, the guide says so plainly instead of inventing one.</p>
+    <div id="missableList"></div>
+  </section>
+</main>
+
+<footer>
+  <p><strong>Sources:</strong> the official trophy list on <a href="https://www.exophase.com/game/grand-theft-auto-vi-psn/trophies/">Exophase</a> (names, descriptions, grades) and <a href="https://psnprofiles.com/trophies/43531-grand-theft-auto-vi">PSNProfiles</a> (grades and PSN counts). Guides are Leonida Ledger's own words, built from the official descriptions — not yet checked in the game. Every trophy's guide names its sources in its detail pane.</p>
+  <p>Leonida Ledger is an unofficial fan guide. No Rockstar Games logo, official artwork or game screenshots are used. Works offline — this page makes no network requests of its own.</p>
+</footer>
+<script src="app.js"></script>
 </body>
 </html>
