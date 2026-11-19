@@ -115,7 +115,9 @@
       return "Stage " + s.n + " · " + done + "/" + inStage.length;
     });
     $("stageCounts").textContent = "Roadmap: " + stageParts.join(" · ");
-    var next = trophies.filter(function (t) { return !earned.has(t.id); })[0];
+    var remaining = trophies.filter(function (t) { return !earned.has(t.id); })
+      .sort(function (a, b) { return (a.stage - b.stage) || (a.id - b.id); });
+    var next = remaining[0];
     if (next) {
       var stageName = STAGES[next.stage - 1].title;
       $("nextUp").textContent = stageName + " — next trophy: #" + next.id + " " + next.name + " (" + gradeLabel(next.grade) + ").";
@@ -206,11 +208,11 @@
       (hidden
         ? '<p class="guide">This trophy is hidden on PlayStation until you earn it. Reveal it from the list, or earn it, to read its guide.</p>'
         : '<p class="guide">' + esc(t.guide) + "</p>" +
+          '<p class="sources"><strong>Sources:</strong> ' + sources +
+          ' · Guide: our own advice from the official description — not yet checked in the game.</p>' +
           (t.whenMissable ? "<p><strong>When it can be missed:</strong> " + esc(t.whenMissable) + "</p>" : "") +
           targetHtml +
           (steps ? "<p><strong>Steps:</strong></p><ol>" + steps + "</ol>" : "")) +
-      '<p class="sources"><strong>Sources:</strong> ' + sources +
-      ' · Guide: our own advice from the official description — not yet checked in the game.</p>' +
       '<button type="button" class="earn-btn" id="earnToggle">' +
         (isEarned ? "✓ Earned — click to unmark" : "Mark as earned") + "</button>";
     $("earnToggle").addEventListener("click", function () {
@@ -273,6 +275,9 @@
 
   function setView(v) {
     view = v;
+    var isTracker = v === "tracker";
+    $("toolbar").style.display = isTracker ? "" : "none";
+    $("hint").style.display = isTracker ? "" : "none";
     ["tracker", "roadmap", "missable"].forEach(function (name) {
       $("view" + name.charAt(0).toUpperCase() + name.slice(1)).hidden = name !== v;
       $("tab" + name.charAt(0).toUpperCase() + name.slice(1)).classList.toggle("active", name === v);
@@ -367,7 +372,9 @@
     else if (shot === "missable") setView("missable");
     else setView("tracker");
     if (shot === "guide") openDetail(17);
+    if (shot === "cover") openDetail(20);
     renderAll();
+    if (shot === "guide") window.scrollTo(0, 230);
     if (shot) {
       setTimeout(function () { window.__shotReady = true; }, 350);
     }

@@ -30,7 +30,7 @@
   <button type="button" class="tab" data-view="missable" id="tabMissable">Missables <span class="pill" id="missablePill">30 flagged</span></button>
 </nav>
 
-<section class="toolbar" aria-label="Tracker controls">
+<section class="toolbar" id="toolbar" aria-label="Tracker controls">
   <label class="search">Search
     <input type="search" id="search" placeholder="Search trophy name or description…" autocomplete="off">
   </label>
@@ -78,7 +78,7 @@
     <button type="button" id="resetBtn">Reset</button>
   </div>
 </section>
-<p class="hint">55 trophies · 1 Platinum · 2 Gold · 6 Silver · 46 Bronze · 28 hidden on PlayStation. Progress saves in this browser (localStorage) — export it to keep a backup. Spoilers ON hides the names of hidden story trophies until you earn them.</p>
+<p class="hint" id="hint">55 trophies · 1 Platinum · 2 Gold · 6 Silver · 46 Bronze · 28 hidden on PlayStation. Progress saves in this browser (localStorage) — export it to keep a backup. Spoilers ON hides the names of hidden story trophies until you earn them.</p>
 
 <main>
   <section id="viewTracker" class="view">
